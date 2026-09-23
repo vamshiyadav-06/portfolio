@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <!-- Primary Meta Tags -->
+  <title>Vamshi Budida | AI Engineer | Python Developer</title>
+  <meta name="title" content="Vamshi Budida | AI Engineer | Python Developer">
+  <meta name="description" content="Portfolio of Vamshi Budida, an AI + Full Stack Engineer specializing in Generative AI, Autonomous Agents, RAG Pipelines, Python, FastAPI, and robust backend software.">
+  <meta name="keywords" content="Vamshi Budida, AI Engineer, Python Developer, Full Stack Engineer, Generative AI, RAG, LangChain, FastAPI, Machine Learning">
+  <meta name="author" content="Vamshi Budida">
+  <meta name="theme-color" content="#07090e">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://github.com/vamshiyadav-06">
+  <meta property="og:title" content="Vamshi Budida | AI Engineer | Python Developer">
+  <meta property="og:description" content="Portfolio of Vamshi Budida, an AI + Full Stack Engineer specializing in Generative AI, Autonomous Agents, and production software.">
+  <meta property="og:image" content="assets/vamshi-profile.jpg">
+
+  <!-- Twitter / X -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Vamshi Budida | AI Engineer | Python Developer">
+  <meta property="twitter:description" content="Portfolio of Vamshi Budida, an AI + Full Stack Engineer specializing in Generative AI and Python backend architectures.">
+  <meta property="twitter:image" content="assets/vamshi-profile.jpg">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/admin.css">
+
+  <!-- Three.js (for high-performance 3D AI WebGL scene) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- Custom Glowing Cursor -->
+  <div id="cursor-dot" class="cursor-dot"></div>
+  <div id="cursor-follower" class="cursor-follower"></div>
+
+  <!-- Ambient Background Grids -->
+  <div class="ambient-bg"></div>
+  <div class="ambient-grid"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar" id="site-navbar">
+    <div class="container nav-container">
+      <a href="#hero" class="nav-brand" aria-label="Vamshi Budida Portfolio Home">
+        <span class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </span>
+        <span class="nav-brand-text">VAMSHI.AI</span>
+      </a>
+
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="#about" class="nav-link">About</a>
+        <a href="#skills" class="nav-link">Skills</a>
+        <a href="#projects" class="nav-link">Projects</a>
+        <a href="#experience" class="nav-link">Experience</a>
+        <a href="#education" class="nav-link">Education</a>
+        <a href="#github" class="nav-link">GitHub</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Command Palette Trigger Button -->
+        <button id="palette-trigger-btn" class="palette-trigger-btn" aria-label="Open command palette" title="Quick Navigation (Ctrl+K)">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <span>Search</span>
+          <span class="kbd-badge">Ctrl K</span>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button class="btn-icon theme-toggle-btn" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg>
+        </button>
+
+        <!-- Admin Portal Trigger Button -->
+        <button class="admin-nav-btn admin-trigger" aria-label="Open Admin Portal" title="Admin Portal (Ctrl+Shift+A)">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span>Admin</span>
+        </button>
+
+        <!-- Mobile Burger Menu Button -->
+        <button id="mobile-menu-toggle" class="mobile-menu-btn" aria-label="Open navigation menu">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <aside id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-drawer-header">
+      <div class="nav-brand">
+        <span class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon></svg>
+        </span>
+        <span class="nav-brand-text">VAMSHI.AI</span>
+      </div>
+      <button id="mobile-menu-close" class="mobile-drawer-close" aria-label="Close navigation menu">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="mobile-nav-links">
+      <a href="#about" class="mobile-nav-link">About</a>
+      <a href="#skills" class="mobile-nav-link">Skills</a>
+      <a href="#projects" class="mobile-nav-link">Projects</a>
+      <a href="#experience" class="mobile-nav-link">Experience</a>
+      <a href="#education" class="mobile-nav-link">Education</a>
+      <a href="#github" class="mobile-nav-link">GitHub Repos</a>
+      <a href="#contact" class="mobile-nav-link">Contact</a>
+      <a href="https://drive.google.com/file/d/1Cw5zAYogBXlEXsfJ7XzEkQovW-t6K0sp/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="mobile-nav-link" data-resume-link="true" style="color: var(--accent-cyan);">Resume (PDF)</a>
+    </div>
+  </aside>
+
+  <main id="main-content">
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+      <div class="container hero-grid">
+        <div class="hero-content-col">
+          <div class="hero-status-pill">
+            <span class="pulse-indicator"></span>
+            <span>Available for AI & Full Stack Roles</span>
+          </div>
+
+          <h1 class="hero-name">VAMSHI BUDIDA</h1>
+          <div class="hero-title">AI Engineer | Python Developer</div>
+
+          <p class="hero-statement">
+            I engineer intelligent applications, autonomous AI agents, and production-oriented software using AI, Python, resilient backend systems, and modern full-stack architectures.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#projects" class="btn btn-primary">
+              <span>View Projects</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+            </a>
+
+            <a href="https://drive.google.com/file/d/1Cw5zAYogBXlEXsfJ7XzEkQovW-t6K0sp/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" data-resume-link="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download Resume</span>
+            </a>
+
+            <a href="#contact" class="btn btn-secondary">
+              <span>Contact Me</span>
+            </a>
+          </div>
+
+          <div class="hero-socials">
+            <a href="https://github.com/vamshiyadav-06" target="_blank" rel="noopener noreferrer" class="hero-social-link" aria-label="GitHub Profile" title="GitHub">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            </a>
+            <a href="https://www.linkedin.com/in/vamshi-budida-087151425/" target="_blank" rel="noopener noreferrer" class="hero-social-link" aria-label="LinkedIn Profile" title="LinkedIn">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </a>
+            <a href="mailto:vamshiyadav1905@gmail.com" class="hero-social-link" aria-label="Direct Email" title="Email">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- 3D AI Visual & Authentic Avatar -->
+        <div class="hero-visual-col">
+          <div class="hero-3d-box">
+            <div id="hero-3d-canvas"></div>
+            
+            <div class="hero-floating-avatar">
+              <img src="assets/vamshi-profile.jpg" alt="Vamshi Budida" class="hero-avatar-img">
+              <div class="hero-avatar-info">
+                <span class="hero-avatar-name">Vamshi Budida</span>
+                <span class="hero-avatar-role">AI + Full Stack</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">About Me</span>
+          <h2 class="section-title">Engineering Practical AI Systems</h2>
+          <p class="section-subtitle">Bridging machine intelligence, algorithmic rigor, and dependable backend software.</p>
+        </div>
+
+        <div class="about-grid">
+          <!-- Profile Card -->
+          <div class="about-profile-card glass-panel">
+            <div class="about-avatar-wrap">
+              <img src="assets/vamshi-profile.jpg" alt="Vamshi Budida - AI Engineer" class="about-avatar-img">
+            </div>
+            <h3 class="about-card-name">Vamshi Budida</h3>
+            <div class="about-card-title">AI Engineer | Python Developer</div>
+
+            <div class="about-meta-list">
+              <div class="about-meta-item">
+                <span class="about-meta-label">Positioning:</span>
+                <span class="about-meta-val">AI + Full Stack Engineer</span>
+              </div>
+              <div class="about-meta-item">
+                <span class="about-meta-label">Education:</span>
+                <span class="about-meta-val">B.Tech — CSE (2026)</span>
+              </div>
+              <div class="about-meta-item">
+                <span class="about-meta-label">Institution:</span>
+                <span class="about-meta-val">Mahaveer Institute of Tech</span>
+              </div>
+              <div class="about-meta-item">
+                <span class="about-meta-label">CGPA:</span>
+                <span class="about-meta-val" style="color: var(--accent-cyan); font-weight: 700;">7.21</span>
+              </div>
+              <div class="about-meta-item">
+                <span class="about-meta-label">Languages:</span>
+                <span class="about-meta-val">Python, SQL</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Narrative & Highlights -->
+          <div class="about-content-col">
+            <h3 class="about-headline">Developing intelligent, production-ready AI applications and scalable backend services.</h3>
+            
+            <p class="about-bio-text">
+              I am a Computer Science & Engineering graduate focused on AI engineering, Python development, backend services, and modern full-stack applications. My technical work revolves around building real, production-ready systems—spanning autonomous agents, Retrieval-Augmented Generation (RAG) pipelines, and intelligent automation bots.
+            </p>
+
+            <p class="about-bio-text">
+              I specialize in constructing robust FastAPI services, vector search indexes with FAISS and pgvector, Supabase architectures, and clean user interfaces. With an emphasis on practical execution, I engineer deterministic solutions that handle unstructured real-world data reliably.
+            </p>
+
+            <div class="about-highlights-grid">
+              <div class="about-highlight-card">
+                <div class="highlight-label">Specialization</div>
+                <div class="highlight-value">Generative AI & Agentic RAG</div>
+              </div>
+              <div class="about-highlight-card">
+                <div class="highlight-label">Backend Architecture</div>
+                <div class="highlight-value">FastAPI, Python, Async REST</div>
+              </div>
+              <div class="about-highlight-card">
+                <div class="highlight-label">Vector & Storage</div>
+                <div class="highlight-value">FAISS, PostgreSQL, Supabase</div>
+              </div>
+              <div class="about-highlight-card">
+                <div class="highlight-label">Automation & Tools</div>
+                <div class="highlight-value">Playwright, Tool Calling, MCP</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Technical Competencies</span>
+          <h2 class="section-title">Skills & Technology Matrix</h2>
+          <p class="section-subtitle">Structured technical skills organized by architectural tier and engineering focus.</p>
+        </div>
+
+        <div id="skills-categories-grid" class="skills-grid">
+          <!-- Rendered dynamically via js/app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Projects Section -->
+    <section id="projects" class="projects-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Featured Work</span>
+          <h2 class="section-title">Engineering Case Studies & Projects</h2>
+          <p class="section-subtitle">Real codebases and AI workflows built with clean architectures and tested implementations.</p>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="project-filter-row">
+          <button class="filter-btn active" data-filter="all">All Projects</button>
+          <button class="filter-btn" data-filter="agentic-genai">Generative AI & Agents</button>
+          <button class="filter-btn" data-filter="automation">Automation & Python</button>
+          <button class="filter-btn" data-filter="fullstack">Full Stack & Backend</button>
+          <button class="filter-btn" data-filter="ml-vision">Computer Vision & ML</button>
+        </div>
+
+        <div id="projects-grid" class="projects-grid">
+          <!-- Rendered dynamically via js/app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience Timeline Section -->
+    <section id="experience" class="experience-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Work History</span>
+          <h2 class="section-title">Industry Experience</h2>
+          <p class="section-subtitle">Hands-on software and AI engineering contributions in production settings.</p>
+        </div>
+
+        <div id="experience-timeline" class="timeline-wrapper">
+          <!-- Rendered dynamically via js/app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="education-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Academic Background</span>
+          <h2 class="section-title">Education & Credentials</h2>
+          <p class="section-subtitle">Rigorous computer science curriculum emphasizing algorithms, systems, and intelligence.</p>
+        </div>
+
+        <div id="education-card-wrap" class="education-card-wrap">
+          <!-- Rendered dynamically via js/app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- GitHub Integration Section -->
+    <section id="github" class="github-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Open Source</span>
+          <h2 class="section-title">GitHub Repositories & Activity</h2>
+          <p class="section-subtitle">Direct live integration with public repositories on GitHub (@vamshiyadav-06).</p>
+        </div>
+
+        <div id="github-repos-grid" class="github-repos-grid">
+          <!-- Rendered dynamically via js/github-api.js -->
+        </div>
+
+        <div class="github-cta-wrap">
+          <a href="https://github.com/vamshiyadav-06" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            <span>Explore All 25+ Repositories on GitHub</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Get in Touch</span>
+          <h2 class="section-title">Let's Build Something Intelligent</h2>
+          <p class="section-subtitle">Interested in collaborating or discussing AI and engineering opportunities? Reach out directly.</p>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Direct Contact Card -->
+          <div class="contact-info-col">
+            <div class="contact-card glass-panel">
+              <h3 class="contact-card-title">Direct Communication</h3>
+              <p class="contact-card-subtitle">Feel free to connect via email, view my repository code, or chat on LinkedIn.</p>
+
+              <div class="contact-methods">
+                <a href="mailto:vamshiyadav1905@gmail.com" class="contact-method-item">
+                  <span class="contact-method-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  </span>
+                  <div class="contact-method-info">
+                    <span class="contact-method-label">Direct Email</span>
+                    <span class="contact-method-val">vamshiyadav1905@gmail.com</span>
+                  </div>
+                </a>
+
+                <a href="https://github.com/vamshiyadav-06" target="_blank" rel="noopener noreferrer" class="contact-method-item">
+                  <span class="contact-method-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                  </span>
+                  <div class="contact-method-info">
+                    <span class="contact-method-label">GitHub</span>
+                    <span class="contact-method-val">github.com/vamshiyadav-06</span>
+                  </div>
+                </a>
+
+                <a href="https://www.linkedin.com/in/vamshi-budida-087151425/" target="_blank" rel="noopener noreferrer" class="contact-method-item">
+                  <span class="contact-method-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                  </span>
+                  <div class="contact-method-info">
+                    <span class="contact-method-label">LinkedIn</span>
+                    <span class="contact-method-val">linkedin.com/in/vamshi-budida</span>
+                  </div>
+                </a>
+
+                <a href="https://drive.google.com/file/d/1Cw5zAYogBXlEXsfJ7XzEkQovW-t6K0sp/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="contact-method-item" data-resume-link="true">
+                  <span class="contact-method-icon">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                  </span>
+                  <div class="contact-method-info">
+                    <span class="contact-method-label">Resume</span>
+                    <span class="contact-method-val">Google Drive Verified PDF</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Form Panel -->
+          <div class="contact-form-panel glass-panel">
+            <form id="contact-form" novalidate>
+              <div id="form-status" class="form-status" role="alert"></div>
+
+              <div class="form-group">
+                <label for="contact-name" class="form-label">Full Name *</label>
+                <input type="text" id="contact-name" class="form-input" placeholder="e.g. Alex Mercer" required>
+              </div>
+
+              <div class="form-group">
+                <label for="contact-email" class="form-label">Email Address *</label>
+                <input type="email" id="contact-email" class="form-input" placeholder="alex@company.com" required>
+              </div>
+
+              <div class="form-group">
+                <label for="contact-message" class="form-label">Message *</label>
+                <textarea id="contact-message" class="form-textarea" placeholder="Discussing an AI role, full-stack project, or engineering inquiry..." required></textarea>
+              </div>
+
+              <button type="submit" id="contact-submit-btn" class="btn btn-primary" style="width: 100%;">
+                <span>Send Message</span>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-logo-row">
+        <span class="nav-logo-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon></svg>
+        </span>
+        <span>VAMSHI BUDIDA</span>
+      </div>
+      <div class="footer-tech-stack">
+        Positioned as AI + Full Stack Engineer · Built with HTML5, CSS3, ES6 JavaScript & WebGL Three.js
+      </div>
+      <div class="footer-copy">
+        © 2026 Vamshi Budida. All rights reserved.
+      </div>
+      <div class="footer-admin-row" style="margin-top: 0.6rem;">
+        <button class="admin-footer-link admin-trigger" aria-label="Open Admin Portal">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span>Admin Portal</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Case Study Modal Drawer -->
+  <div id="case-study-modal" class="case-study-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="case-study-dialog">
+      <div class="case-study-nav-header">
+        <div class="cs-nav-title-group">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--accent-cyan)" stroke-width="2" fill="none"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span>System Case Study & Architecture</span>
+        </div>
+        <button id="case-study-close-btn" class="case-study-close-btn" aria-label="Close Case Study Dialog">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div id="case-study-body" class="case-study-scroll-body">
+        <!-- Rendered dynamically via js/case-study-modal.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Palette Modal (Ctrl+K) -->
+  <div id="command-palette-modal" class="command-palette-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="command-palette-box">
+      <div class="command-input-wrap">
+        <svg class="command-search-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="command-input" class="command-input" placeholder="Type a section or command (e.g. Projects, Skills, Resume, Theme)..." autocomplete="off" spellcheck="false">
+      </div>
+
+      <ul id="command-list" class="command-list" role="listbox">
+        <!-- Rendered dynamically via js/command-palette.js -->
+      </ul>
+
+      <div class="command-footer">
+        <div class="command-hints">
+          <span><span class="kbd-badge">↑↓</span> Navigate</span>
+          <span><span class="kbd-badge">↵</span> Select</span>
+          <span><span class="kbd-badge">ESC</span> Close</span>
+        </div>
+        <span>Quick Navigation</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Portal Modal (Ctrl+Shift+A) -->
+  <div id="admin-modal-backdrop" class="admin-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <div class="admin-header-title">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--accent-cyan)" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span>Admin Portal</span>
+          <span class="admin-badge">v1.0</span>
+        </div>
+        <button id="admin-close-btn" class="admin-close-btn" aria-label="Close Admin Modal">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="admin-modal-body">
+        <!-- 1. LOGIN VIEW -->
+        <div id="admin-login-view">
+          <div id="admin-login-status" class="admin-alert" role="alert"></div>
+          <form id="admin-login-form">
+            <div class="admin-form-group">
+              <label for="admin-login-user" class="admin-form-label">Username</label>
+              <input type="text" id="admin-login-user" class="admin-input" placeholder="admin" required autocomplete="username">
+            </div>
+
+            <div class="admin-form-group">
+              <label for="admin-login-pwd" class="admin-form-label">Password</label>
+              <div class="admin-input-wrapper">
+                <input type="password" id="admin-login-pwd" class="admin-input admin-input-with-btn" placeholder="Enter password" required autocomplete="current-password">
+                <button type="button" class="admin-toggle-pwd-btn" data-target="admin-login-pwd" aria-label="Toggle password visibility">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="7" r="3"></circle></svg>
+                </button>
+              </div>
+              <div class="admin-form-desc">Default credentials: Username <code>admin</code>, Password <code>admin</code>. (You can change your password inside).</div>
+            </div>
+
+            <div class="admin-actions-row">
+              <button type="submit" class="admin-btn admin-btn-primary" style="width: 100%;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                <span>Authenticate & Enter</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 2. DASHBOARD VIEW (Shown once authenticated) -->
+        <div id="admin-dashboard-view" style="display: none;">
+          <!-- User Session Status Bar -->
+          <div class="admin-user-bar">
+            <div class="admin-user-info">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--accent-cyan)" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span>Logged in as: <strong>Admin</strong></span>
+            </div>
+            <button id="admin-logout-btn" class="admin-btn admin-btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>Logout</span>
+            </button>
+          </div>
+
+          <!-- Navigation Tabs -->
+          <div class="admin-tabs">
+            <button class="admin-tab-btn active" data-tab="resume">
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              <span>Resume Link</span>
+            </button>
+            <button class="admin-tab-btn" data-tab="password">
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Change Password</span>
+            </button>
+            <button class="admin-tab-btn" data-tab="email">
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>Email Service</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: RESUME LINK -->
+          <div id="admin-tab-resume" class="admin-tab-panel active">
+            <div id="admin-resume-status" class="admin-alert" role="alert"></div>
+
+            <div class="admin-current-box">
+              <div class="admin-current-label">Current Active Resume Link</div>
+              <span id="admin-current-resume-display" class="admin-current-url">...</span>
+            </div>
+
+            <form id="admin-resume-form">
+              <div class="admin-form-group">
+                <label for="admin-resume-input" class="admin-form-label">New Resume URL</label>
+                <input type="url" id="admin-resume-input" class="admin-input" placeholder="https://drive.google.com/file/d/..." required>
+                <div class="admin-form-desc">Accepts Google Drive, Dropbox, Notion, or personal hosted PDF link. Starts with <code>https://</code>.</div>
+              </div>
+
+              <div class="admin-actions-row">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Update Live Resume Link</span>
+                </button>
+                <button type="button" id="admin-reset-resume-btn" class="admin-btn admin-btn-secondary">
+                  <span>Reset Default</span>
+                </button>
+              </div>
+            </form>
+
+            <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="admin-form-label" style="margin-bottom: 0;">Code Snippet for Git Commit</span>
+                <button type="button" id="admin-copy-code-btn" class="admin-btn admin-btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;">
+                  <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>Copy Snippet</span>
+                </button>
+              </div>
+              <pre id="admin-code-snippet" class="admin-code-snippet">// In js/config.js (line 15):&#10;resumeUrl: "...",</pre>
+              <div class="admin-form-desc">Changes take effect immediately on your site. If pushing to GitHub / Vercel, you can also paste this into <code>js/config.js</code> so it's baked into your repo.</div>
+            </div>
+          </div>
+
+          <!-- TAB 2: CHANGE PASSWORD -->
+          <div id="admin-tab-password" class="admin-tab-panel">
+            <div id="admin-password-status" class="admin-alert" role="alert"></div>
+
+            <form id="admin-change-password-form">
+              <div class="admin-form-group">
+                <label for="admin-pwd-current" class="admin-form-label">Current Password</label>
+                <div class="admin-input-wrapper">
+                  <input type="password" id="admin-pwd-current" class="admin-input admin-input-with-btn" placeholder="Enter your current password" required autocomplete="current-password">
+                  <button type="button" class="admin-toggle-pwd-btn" data-target="admin-pwd-current" aria-label="Toggle password visibility">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="7" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="admin-pwd-new" class="admin-form-label">New Password</label>
+                <div class="admin-input-wrapper">
+                  <input type="password" id="admin-pwd-new" class="admin-input admin-input-with-btn" placeholder="Enter new password (min. 5 characters)" required autocomplete="new-password">
+                  <button type="button" class="admin-toggle-pwd-btn" data-target="admin-pwd-new" aria-label="Toggle password visibility">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="7" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="admin-pwd-confirm" class="admin-form-label">Confirm New Password</label>
+                <div class="admin-input-wrapper">
+                  <input type="password" id="admin-pwd-confirm" class="admin-input admin-input-with-btn" placeholder="Repeat new password" required autocomplete="new-password">
+                  <button type="button" class="admin-toggle-pwd-btn" data-target="admin-pwd-confirm" aria-label="Toggle password visibility">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="7" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="admin-actions-row">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Update Password</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 3: EMAIL NOTIFICATIONS -->
+          <div id="admin-tab-email" class="admin-tab-panel">
+            <div id="admin-email-status" class="admin-alert" role="alert"></div>
+
+            <div class="admin-current-box">
+              <div class="admin-current-label">Recipient Email Address</div>
+              <span class="admin-current-url">vamshiyadav1905@gmail.com</span>
+            </div>
+
+            <form id="admin-email-form">
+              <div class="admin-form-group">
+                <label for="admin-email-key-input" class="admin-form-label">Web3Forms Access Key (Free)</label>
+                <input type="text" id="admin-email-key-input" class="admin-input" placeholder="e.g. 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d">
+                <div class="admin-form-desc">
+                  To receive contact form submissions straight into <strong>vamshiyadav1905@gmail.com</strong> for free:
+                  <br>1. Visit <a href="https://web3forms.com" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: underline;">web3forms.com</a>.
+                  <br>2. Type <code>vamshiyadav1905@gmail.com</code> and copy the access key sent to your inbox.
+                  <br>3. Paste it above and click Save. That's it!
+                </div>
+              </div>
+
+              <div class="admin-actions-row">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Save Email Key</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/three-scene.js"></script>
+  <script src="js/github-api.js"></script>
+  <script src="js/command-palette.js"></script>
+  <script src="js/case-study-modal.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

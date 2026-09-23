@@ -1,0 +1,248 @@
+/* ==========================================================================
+   Responsive Adaptations & Accessibility Media Queries
+   ========================================================================== */
+
+/* Hide mobile navigation drawer on desktop screens */
+@media (min-width: 769px) {
+  .mobile-nav-drawer {
+    display: none !important;
+  }
+}
+
+/* ---------------- Tablet Devices (< 1024px) ---------------- */
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .hero-name {
+    font-size: 3.2rem;
+  }
+
+  .hero-3d-box {
+    height: 380px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .cs-grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------------- Mobile Menu Drawer & Small Devices (< 768px) ---------------- */
+@media (max-width: 768px) {
+  :root {
+    --nav-height: 66px;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+  }
+
+  /* Mobile Drawer */
+  .mobile-nav-drawer {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 9, 14, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    transform: translateX(100%);
+    transition: transform var(--transition-normal);
+  }
+
+  .mobile-nav-drawer.active {
+    transform: translateX(0);
+  }
+
+  .mobile-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .mobile-drawer-close {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  .mobile-nav-link {
+    font-size: 1.25rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .hero-name {
+    font-size: 2.5rem;
+  }
+
+  .hero-title {
+    font-size: 1.2rem;
+  }
+
+  .hero-statement {
+    font-size: 1rem;
+  }
+
+  .hero-3d-box {
+    height: 320px;
+  }
+
+  .hero-floating-avatar {
+    bottom: 1rem;
+    left: 1rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .hero-avatar-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .section-title {
+    font-size: 1.85rem;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .github-repos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .case-study-modal {
+    padding: 0.5rem;
+  }
+
+  .case-study-dialog {
+    max-height: 96vh;
+    border-radius: var(--radius-md);
+  }
+
+  .case-study-scroll-body {
+    padding: 1.4rem;
+    gap: 1.5rem;
+  }
+
+  .cs-title {
+    font-size: 1.6rem;
+  }
+
+  .arch-nodes-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .about-highlights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .command-palette-modal {
+    padding-top: 5vh;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .command-hints {
+    display: none;
+  }
+}
+
+/* ---------------- Extra Small Mobile (< 480px) ---------------- */
+@media (max-width: 480px) {
+  .hero-name {
+    font-size: 2.1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .hero-socials {
+    justify-content: center;
+  }
+
+  .arch-nodes-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+
+  .project-card-footer .btn {
+    width: 100%;
+  }
+
+  .timeline-wrapper {
+    padding-left: 1.8rem;
+  }
+
+  .timeline-dot {
+    left: -1.8rem;
+  }
+}
+
+/* ---------------- Reduced Motion Preference ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .cursor-dot, .cursor-follower {
+    display: none !important;
+  }
+}
+
+/* ---------------- Touch Devices Cursor Suppression ---------------- */
+@media (pointer: coarse) {
+  .cursor-dot, .cursor-follower {
+    display: none !important;
+  }
+}
