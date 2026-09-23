@@ -1,51 +1,60 @@
 /**
- * Admin Portal & Dynamic Configuration Manager
+ * Admin Portal & Dynamic Configuration Manager (Production Google OAuth 2.0)
  * Handles:
- *  - Authentication & Secure Session
- *  - SHA-256 Password Hashing & Password Change
+ *  - Google Identity Services (GIS) Sign-In Authentication
+ *  - Strict Administrator Email Verification (vamshiyadav1905@gmail.com)
+ *  - Authenticated Session State with JWT Expiry Verification
  *  - Dynamic Resume Link Management with DOM Sync & LocalStorage Persistence
  *  - Contact Email Service Configuration
+ *  - Configurable Google OAuth Client ID
  */
 
 (function () {
   "use strict";
 
   // Storage Keys
-  const STORAGE_AUTH_KEY = "portfolio_admin_credentials";
-  const STORAGE_SESSION_KEY = "portfolio_admin_session";
+  const STORAGE_SESSION_KEY = "portfolio_admin_user_session";
   const STORAGE_RESUME_KEY = "portfolio_resume_url";
   const STORAGE_WEB3FORMS_KEY = "portfolio_web3forms_key";
+  const STORAGE_CLIENTID_KEY = "portfolio_google_client_id";
 
-  // Default credentials (will be initialized if empty)
-  const DEFAULT_USERNAME = "admin";
-  const DEFAULT_PASSWORD = "admin"; // Easy to remember, change immediately
-
-  // Helper: SHA-256 hashing using native Web Crypto API
-  async function sha256(text) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  // Authorized Admin Email
+  function getAuthorizedEmail() {
+    return (
+      (window.PORTFOLIO_DATA &&
+        window.PORTFOLIO_DATA.admin &&
+        window.PORTFOLIO_DATA.admin.authorizedEmail) ||
+      "vamshiyadav1905@gmail.com"
+    ).toLowerCase();
   }
 
-  // Initialize or get stored credentials
-  async function getStoredCredentials() {
-    let creds = localStorage.getItem(STORAGE_AUTH_KEY);
-    if (!creds) {
-      const defaultHash = await sha256(DEFAULT_PASSWORD);
-      const initial = {
-        username: DEFAULT_USERNAME,
-        passwordHash: defaultHash,
-        updatedAt: new Date().toISOString()
-      };
-      localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify(initial));
-      return initial;
-    }
+  // Active Google Client ID (from config or localStorage)
+  function getGoogleClientId() {
+    const saved = localStorage.getItem(STORAGE_CLIENTID_KEY);
+    if (saved && saved.trim()) return saved.trim();
+
+    return (
+      (window.PORTFOLIO_DATA &&
+        window.PORTFOLIO_DATA.admin &&
+        window.PORTFOLIO_DATA.admin.googleClientId) ||
+      ""
+    ).trim();
+  }
+
+  // Parse JWT token from Google Identity Services
+  function parseJwt(token) {
     try {
-      return JSON.parse(creds);
-    } catch (e) {
-      console.error("Failed to parse admin credentials:", e);
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (err) {
+      console.error("Failed to parse Google JWT credential:", err);
       return null;
     }
   }
@@ -74,8 +83,10 @@
       window.PORTFOLIO_DATA.personal.resumeUrl = cleanUrl;
     }
 
-    // 2. Update all DOM elements with data-resume-link
-    const resumeLinks = document.querySelectorAll("[data-resume-link], a[href*='drive.google.com/file/d']");
+    // 2. Update all DOM elements with data-resume-link or drive link
+    const resumeLinks = document.querySelectorAll(
+      "[data-resume-link], a[href*='drive.google.com/file/d']"
+    );
     resumeLinks.forEach((link) => {
       link.setAttribute("href", cleanUrl);
     });
@@ -95,18 +106,16 @@
 
   // DOM Elements
   let backdrop,
-    dialog,
     closeBtn,
     loginView,
     dashboardView,
-    loginForm,
     loginStatus,
-    changePwdForm,
-    changePwdStatus,
     resumeForm,
     resumeStatus,
     emailForm,
     emailStatus,
+    oauthForm,
+    oauthStatus,
     logoutBtn,
     resetResumeBtn,
     copyCodeBtn;
@@ -115,23 +124,136 @@
     backdrop = document.getElementById("admin-modal-backdrop");
     if (!backdrop) return false;
 
-    dialog = backdrop.querySelector(".admin-modal-dialog");
     closeBtn = document.getElementById("admin-close-btn");
     loginView = document.getElementById("admin-login-view");
     dashboardView = document.getElementById("admin-dashboard-view");
-    loginForm = document.getElementById("admin-login-form");
     loginStatus = document.getElementById("admin-login-status");
-    changePwdForm = document.getElementById("admin-change-password-form");
-    changePwdStatus = document.getElementById("admin-password-status");
     resumeForm = document.getElementById("admin-resume-form");
     resumeStatus = document.getElementById("admin-resume-status");
     emailForm = document.getElementById("admin-email-form");
     emailStatus = document.getElementById("admin-email-status");
+    oauthForm = document.getElementById("admin-oauth-form");
+    oauthStatus = document.getElementById("admin-oauth-status");
     logoutBtn = document.getElementById("admin-logout-btn");
     resetResumeBtn = document.getElementById("admin-reset-resume-btn");
     copyCodeBtn = document.getElementById("admin-copy-code-btn");
 
     return true;
+  }
+
+  // Check if session is valid and active
+  function getActiveSession() {
+    try {
+      const data = sessionStorage.getItem(STORAGE_SESSION_KEY);
+      if (!data) return null;
+      const session = JSON.parse(data);
+      if (session.expiresAt && Date.now() > session.expiresAt) {
+        sessionStorage.removeItem(STORAGE_SESSION_KEY);
+        return null;
+      }
+      return session;
+    } catch (e) {
+      sessionStorage.removeItem(STORAGE_SESSION_KEY);
+      return null;
+    }
+  }
+
+  // Handle Google OAuth Credential Response
+  function handleGoogleCredentialResponse(response) {
+    if (!response || !response.credential) {
+      showAlert(loginStatus, "Google authentication did not return credentials. Please try again.", "error");
+      return;
+    }
+
+    const payload = parseJwt(response.credential);
+    if (!payload || !payload.email) {
+      showAlert(loginStatus, "Could not verify identity token from Google. Please try again.", "error");
+      return;
+    }
+
+    const authorizedEmail = getAuthorizedEmail();
+    const userEmail = payload.email.toLowerCase();
+
+    // Verify if signed-in Google account matches administrator
+    if (userEmail === authorizedEmail && payload.email_verified) {
+      const sessionData = {
+        email: payload.email,
+        name: payload.name || "Vamshi Budida",
+        picture: payload.picture || "",
+        loginAt: new Date().toISOString(),
+        expiresAt: payload.exp ? payload.exp * 1000 : Date.now() + 3600 * 1000 * 24
+      };
+
+      sessionStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(sessionData));
+      showAlert(loginStatus, `Identity verified! Welcome, ${payload.name || "Administrator"}. Entering portal...`, "success");
+
+      setTimeout(() => {
+        clearAlerts();
+        showDashboardView(sessionData);
+        switchTab("resume");
+        if (window.showToast) window.showToast(`Verified as ${payload.name || "Admin"}`);
+      }, 500);
+    } else {
+      // Access Denied: Signed in with unauthorized Google account
+      showAlert(
+        loginStatus,
+        `Access Denied: Account '${payload.email}' is not authorized. Only ${authorizedEmail} has administrative permissions.`,
+        "error"
+      );
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.revoke(payload.email, () => {});
+      }
+    }
+  }
+  window.handleGoogleCredentialResponse = handleGoogleCredentialResponse;
+
+  // Initialize Google Identity Services Button
+  function initGoogleSignIn() {
+    const clientId = getGoogleClientId();
+    const btnContainer = document.getElementById("google-signin-btn");
+    const noClientIdNotice = document.getElementById("google-clientid-prompt");
+
+    if (!clientId) {
+      if (btnContainer) btnContainer.innerHTML = "";
+      if (noClientIdNotice) noClientIdNotice.style.display = "block";
+      return;
+    }
+
+    if (noClientIdNotice) noClientIdNotice.style.display = "none";
+
+    // Wait for GIS library if loading
+    function renderGis() {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true
+          });
+
+          if (btnContainer) {
+            btnContainer.innerHTML = "";
+            window.google.accounts.id.renderButton(btnContainer, {
+              theme: "filled_blue",
+              size: "large",
+              type: "standard",
+              shape: "rectangular",
+              text: "signin_with",
+              logo_alignment: "left",
+              width: 280
+            });
+          }
+        } catch (e) {
+          console.error("Google Sign-In initialization error:", e);
+          showAlert(loginStatus, `Google Sign-In initialization error: ${e.message}`, "error");
+        }
+      } else {
+        setTimeout(renderGis, 150);
+      }
+    }
+
+    renderGis();
   }
 
   // Open / Close Modal
@@ -142,13 +264,13 @@
     backdrop.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
 
-    // Check session
-    const isAuthenticated = sessionStorage.getItem(STORAGE_SESSION_KEY) === "true";
-    if (isAuthenticated) {
-      showDashboardView();
+    const session = getActiveSession();
+    if (session) {
+      showDashboardView(session);
       switchTab(initialTab);
     } else {
       showLoginView();
+      initGoogleSignIn();
     }
   }
   window.openAdminModal = openAdminModal;
@@ -166,12 +288,34 @@
   function showLoginView() {
     loginView.style.display = "block";
     dashboardView.style.display = "none";
-    document.getElementById("admin-login-user").focus();
   }
 
-  function showDashboardView() {
+  function showDashboardView(session) {
     loginView.style.display = "none";
     dashboardView.style.display = "block";
+
+    // Update user profile info
+    const sessionData = session || getActiveSession() || {
+      name: "Vamshi Budida",
+      email: getAuthorizedEmail(),
+      picture: ""
+    };
+
+    const nameElem = document.getElementById("admin-user-name");
+    const emailElem = document.getElementById("admin-user-email");
+    const avatarElem = document.getElementById("admin-user-avatar");
+
+    if (nameElem) nameElem.textContent = sessionData.name || "Vamshi Budida";
+    if (emailElem) emailElem.textContent = sessionData.email || getAuthorizedEmail();
+
+    if (avatarElem) {
+      if (sessionData.picture) {
+        avatarElem.innerHTML = `<img src="${sessionData.picture}" alt="${sessionData.name}" class="admin-avatar-img">`;
+      } else {
+        const initial = (sessionData.name || "V").charAt(0).toUpperCase();
+        avatarElem.innerHTML = `<div class="admin-avatar-fallback">${initial}</div>`;
+      }
+    }
 
     // Refresh current values
     const currentUrl = getActiveResumeUrl();
@@ -179,6 +323,7 @@
     const resumeInput = document.getElementById("admin-resume-input");
     const codeSnippet = document.getElementById("admin-code-snippet");
     const emailKeyInput = document.getElementById("admin-email-key-input");
+    const oauthInput = document.getElementById("admin-clientid-input");
 
     if (currentDisplay) currentDisplay.textContent = currentUrl;
     if (resumeInput) resumeInput.value = currentUrl;
@@ -186,8 +331,10 @@
       codeSnippet.textContent = `// In js/config.js (line 15):\nresumeUrl: "${currentUrl}",`;
     }
 
-    const savedKey = localStorage.getItem(STORAGE_WEB3FORMS_KEY) || "";
-    if (emailKeyInput) emailKeyInput.value = savedKey;
+    const savedEmailKey = localStorage.getItem(STORAGE_WEB3FORMS_KEY) || "";
+    if (emailKeyInput) emailKeyInput.value = savedEmailKey;
+
+    if (oauthInput) oauthInput.value = getGoogleClientId();
   }
 
   function showAlert(elem, msg, type = "info") {
@@ -241,9 +388,7 @@
     });
 
     // Close button & backdrop click
-    if (closeBtn) {
-      closeBtn.addEventListener("click", closeAdminModal);
-    }
+    if (closeBtn) closeBtn.addEventListener("click", closeAdminModal);
     backdrop.addEventListener("click", (e) => {
       if (e.target === backdrop) closeAdminModal();
     });
@@ -255,66 +400,36 @@
       });
     });
 
-    // Toggle password fields visibility
-    document.querySelectorAll(".admin-toggle-pwd-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const targetId = btn.dataset.target;
-        const input = document.getElementById(targetId);
-        if (!input) return;
-        if (input.type === "password") {
-          input.type = "text";
-          btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
-        } else {
-          input.type = "password";
-          btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
-        }
-      });
-    });
-
-    // Login Form Submit
-    if (loginForm) {
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const userInput = document.getElementById("admin-login-user").value.trim();
-        const pwdInput = document.getElementById("admin-login-pwd").value;
-
-        if (!userInput || !pwdInput) {
-          showAlert(loginStatus, "Please provide both username and password.", "error");
+    // Save Client ID from the setup prompt on login view
+    const promptSaveBtn = document.getElementById("admin-save-clientid-prompt-btn");
+    if (promptSaveBtn) {
+      promptSaveBtn.addEventListener("click", () => {
+        const input = document.getElementById("admin-login-clientid-input");
+        const val = input ? input.value.trim() : "";
+        if (!val) {
+          showAlert(loginStatus, "Please enter a valid Google OAuth Client ID.", "error");
           return;
         }
-
-        const creds = await getStoredCredentials();
-        const inputHash = await sha256(pwdInput);
-
-        if (
-          userInput.toLowerCase() === creds.username.toLowerCase() &&
-          inputHash === creds.passwordHash
-        ) {
-          sessionStorage.setItem(STORAGE_SESSION_KEY, "true");
-          showAlert(loginStatus, "Authentication successful! Entering admin portal...", "success");
-          setTimeout(() => {
-            clearAlerts();
-            showDashboardView();
-            switchTab("resume");
-            if (window.showToast) window.showToast("Welcome to Admin Portal");
-          }, 450);
-        } else {
-          showAlert(
-            loginStatus,
-            "Invalid username or password. Default username: 'admin', default password: 'admin'",
-            "error"
-          );
-        }
+        localStorage.setItem(STORAGE_CLIENTID_KEY, val);
+        showAlert(loginStatus, "Google Client ID saved! Initializing Google Sign-In...", "success");
+        setTimeout(() => {
+          initGoogleSignIn();
+        }, 300);
       });
     }
 
     // Logout
     if (logoutBtn) {
       logoutBtn.addEventListener("click", () => {
+        const session = getActiveSession();
+        if (session && session.email && window.google && window.google.accounts && window.google.accounts.id) {
+          window.google.accounts.id.revoke(session.email, () => {});
+        }
         sessionStorage.removeItem(STORAGE_SESSION_KEY);
-        showAlert(loginStatus, "You have been logged out successfully.", "info");
+        showAlert(loginStatus, "You have been securely signed out.", "info");
         showLoginView();
-        if (window.showToast) window.showToast("Admin Logged Out");
+        initGoogleSignIn();
+        if (window.showToast) window.showToast("Signed Out");
       });
     }
 
@@ -373,7 +488,7 @@
             if (window.showToast) window.showToast("Copied to clipboard!");
             showAlert(
               resumeStatus,
-              "Snippet copied to clipboard! Paste this into js/config.js if you want the link permanently baked into the source code.",
+              "Snippet copied to clipboard! Paste this into js/config.js to bake it into Git permanently.",
               "success"
             );
           },
@@ -381,57 +496,6 @@
             showAlert(resumeStatus, "Failed to copy automatically. Please copy the snippet box manually.", "error");
           }
         );
-      });
-    }
-
-    // Change Password Form Submit
-    if (changePwdForm) {
-      changePwdForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const currentPwd = document.getElementById("admin-pwd-current").value;
-        const newPwd = document.getElementById("admin-pwd-new").value;
-        const confirmPwd = document.getElementById("admin-pwd-confirm").value;
-
-        if (!currentPwd || !newPwd || !confirmPwd) {
-          showAlert(changePwdStatus, "Please complete all password fields.", "error");
-          return;
-        }
-
-        if (newPwd.length < 5) {
-          showAlert(changePwdStatus, "New password must be at least 5 characters long.", "error");
-          return;
-        }
-
-        if (newPwd !== confirmPwd) {
-          showAlert(changePwdStatus, "New password and Confirm password do not match.", "error");
-          return;
-        }
-
-        const creds = await getStoredCredentials();
-        const currentHash = await sha256(currentPwd);
-
-        if (currentHash !== creds.passwordHash) {
-          showAlert(changePwdStatus, "Incorrect current password.", "error");
-          return;
-        }
-
-        // Hash and save new password
-        const newHash = await sha256(newPwd);
-        const updated = {
-          username: creds.username,
-          passwordHash: newHash,
-          updatedAt: new Date().toISOString()
-        };
-        localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify(updated));
-
-        // Reset form
-        changePwdForm.reset();
-        showAlert(
-          changePwdStatus,
-          "Password updated successfully! Your new password is now active.",
-          "success"
-        );
-        if (window.showToast) window.showToast("Admin Password Changed");
       });
     }
 
@@ -446,7 +510,7 @@
           localStorage.setItem(STORAGE_WEB3FORMS_KEY, key);
           showAlert(
             emailStatus,
-            "Web3Forms Access Key saved! All portfolio contact submissions will now deliver straight to your inbox.",
+            "Web3Forms Access Key saved! Contact inquiries will deliver straight to vamshiyadav1905@gmail.com.",
             "success"
           );
         } else {
@@ -461,9 +525,30 @@
       });
     }
 
+    // Google OAuth Settings Form Submit
+    if (oauthForm) {
+      oauthForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = document.getElementById("admin-clientid-input");
+        const val = input.value.trim();
+
+        if (val) {
+          localStorage.setItem(STORAGE_CLIENTID_KEY, val);
+          showAlert(oauthStatus, "Google OAuth Client ID saved! Google Sign-In is configured.", "success");
+        } else {
+          localStorage.removeItem(STORAGE_CLIENTID_KEY);
+          showAlert(oauthStatus, "Google Client ID removed.", "info");
+        }
+        if (window.showToast) window.showToast("Google OAuth Settings Saved");
+      });
+    }
+
     // Global Keyboard Shortcut: Ctrl + Shift + A to open Admin
     document.addEventListener("keydown", (e) => {
-      if ((e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) || (e.altKey && (e.key === "a" || e.key === "A"))) {
+      if (
+        (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) ||
+        (e.altKey && (e.key === "a" || e.key === "A"))
+      ) {
         e.preventDefault();
         if (backdrop && backdrop.classList.contains("active")) {
           closeAdminModal();
@@ -480,7 +565,6 @@
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       setupEvents();
-      // Apply active resume URL on initial load
       applyResumeUrl(getActiveResumeUrl());
     });
   } else {

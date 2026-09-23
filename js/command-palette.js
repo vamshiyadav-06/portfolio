@@ -82,7 +82,7 @@ class CommandPalette {
       {
         id: "act-admin",
         title: "Admin Portal",
-        subtitle: "Login, update resume link, change password (Ctrl+Shift+A)",
+        subtitle: "Google Sign-In, update resume link, email settings (Ctrl+Shift+A)",
         icon: "lock",
         action: () => {
           if (window.openAdminModal) window.openAdminModal();

@@ -18,6 +18,11 @@ const PORTFOLIO_DATA = {
     languages: ["Python", "SQL"]
   },
 
+  admin: {
+    authorizedEmail: "vamshiyadav1905@gmail.com",
+    googleClientId: "452935950182-tjr2ktjhus4mc5cr8caigqsm2c77fbu8.apps.googleusercontent.com"
+  },
+
   about: {
     headline: "Engineering intelligent, production-ready AI systems and resilient backend services.",
     bio: [

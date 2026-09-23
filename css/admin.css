@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Admin Portal Styles (Vamshi Budida Portfolio)
+   Admin Portal Styles (Vamshi Budida Portfolio) - Production Google OAuth
    ========================================================================== */
 
 /* Admin Trigger Buttons */
@@ -48,9 +48,9 @@
 .admin-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(4, 7, 15, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(4, 7, 15, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -75,7 +75,7 @@
   max-width: 580px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), var(--glow-cyan);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), var(--glow-cyan);
   transform: translateY(20px) scale(0.97);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
@@ -176,6 +176,154 @@
   color: #a5f3fc;
 }
 
+/* ---------------- Google OAuth Sign-In View ---------------- */
+.admin-google-auth-box {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.25rem;
+}
+
+.google-auth-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.google-auth-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.google-auth-subtitle {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  max-width: 380px;
+  margin: 0 auto 1.5rem auto;
+  line-height: 1.45;
+}
+
+.google-auth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+  border-radius: var(--radius-full);
+  color: var(--accent-cyan);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  margin-bottom: 1.25rem;
+}
+
+.google-signin-btn-container {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.google-clientid-notice {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  text-align: left;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.google-clientid-notice a {
+  color: var(--accent-cyan);
+  text-decoration: underline;
+}
+
+/* User Session Bar in Authenticated Dashboard */
+.admin-user-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 242, 254, 0.06);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+}
+
+.admin-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-avatar-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-cyan);
+  object-fit: cover;
+  background: rgba(0, 242, 254, 0.1);
+}
+
+.admin-avatar-fallback {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-cyan);
+  background: rgba(0, 242, 254, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.admin-profile-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-profile-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.admin-profile-email {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.admin-verified-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-full);
+  color: #6ee7b7;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+}
+
 /* Tabs Navigation */
 .admin-tabs {
   display: flex;
@@ -267,27 +415,6 @@
   box-shadow: 0 0 0 2px rgba(0, 242, 254, 0.2);
 }
 
-.admin-input-with-btn {
-  padding-right: 2.75rem;
-}
-
-.admin-toggle-pwd-btn {
-  position: absolute;
-  right: 0.5rem;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.admin-toggle-pwd-btn:hover {
-  color: var(--text-primary);
-}
-
 /* Current Value Box */
 .admin-current-box {
   background: rgba(0, 0, 0, 0.25);
@@ -358,17 +485,6 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-.admin-btn-danger {
-  background: rgba(239, 68, 68, 0.15);
-  color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-.admin-btn-danger:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: #ef4444;
-}
-
 .admin-code-snippet {
   background: #060b17;
   border: 1px solid var(--border-subtle);
@@ -381,30 +497,6 @@
   white-space: pre-wrap;
   word-break: break-all;
   user-select: all;
-}
-
-/* User Session Bar */
-.admin-user-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 0.85rem;
-  background: rgba(0, 242, 254, 0.05);
-  border: 1px solid rgba(0, 242, 254, 0.15);
-  border-radius: var(--radius-md);
-  margin-bottom: 1.25rem;
-  font-size: 0.82rem;
-}
-
-.admin-user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-}
-
-.admin-user-info strong {
-  color: var(--accent-cyan);
 }
 
 @media (max-width: 600px) {
