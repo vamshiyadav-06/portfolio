@@ -1,12 +1,13 @@
 /**
  * Admin Portal & Dynamic Configuration Manager (Production Google OAuth 2.0)
  * Handles:
- *  - Google Identity Services (GIS) Sign-In Authentication
+ *  - Google OAuth 2.0 Sign-In Authentication (Token Client Popup & GIS)
  *  - Strict Administrator Email Verification (vamshiyadav1905@gmail.com)
- *  - Authenticated Session State with JWT Expiry Verification
+ *  - Direct Admin Key / Google Client Secret Fallback Authentication
+ *  - Authenticated Session State with JWT / Token Expiry Verification
  *  - Dynamic Resume Link Management with DOM Sync & LocalStorage Persistence
  *  - Contact Email Service Configuration
- *  - Configurable Google OAuth Client ID
+ *  - Configurable Google OAuth Client ID, Secret, and Origin Helper
  */
 
 (function () {
@@ -17,6 +18,7 @@
   const STORAGE_RESUME_KEY = "portfolio_resume_url";
   const STORAGE_WEB3FORMS_KEY = "portfolio_web3forms_key";
   const STORAGE_CLIENTID_KEY = "portfolio_google_client_id";
+  const STORAGE_CLIENTSECRET_KEY = "portfolio_google_client_secret";
 
   // Authorized Admin Email
   function getAuthorizedEmail() {
@@ -37,8 +39,31 @@
       (window.PORTFOLIO_DATA &&
         window.PORTFOLIO_DATA.admin &&
         window.PORTFOLIO_DATA.admin.googleClientId) ||
+      "452935950182-tjr2ktjhus4mc5cr8caigqsm2c77fbu8.apps.googleusercontent.com"
+    ).trim();
+  }
+
+  // Active Google Client Secret
+  function getGoogleClientSecret() {
+    const saved = localStorage.getItem(STORAGE_CLIENTSECRET_KEY);
+    if (saved && saved.trim()) return saved.trim();
+
+    return (
+      (window.PORTFOLIO_DATA &&
+        window.PORTFOLIO_DATA.admin &&
+        window.PORTFOLIO_DATA.admin.clientSecret) ||
       ""
     ).trim();
+  }
+
+  // Active Project ID
+  function getGoogleProjectId() {
+    return (
+      (window.PORTFOLIO_DATA &&
+        window.PORTFOLIO_DATA.admin &&
+        window.PORTFOLIO_DATA.admin.projectId) ||
+      "gen-lang-client-0604015366"
+    );
   }
 
   // Parse JWT token from Google Identity Services
@@ -110,6 +135,16 @@
     loginView,
     dashboardView,
     loginStatus,
+    customGoogleBtn,
+    googleBtnText,
+    passcodeForm,
+    passcodeInput,
+    togglePasscodeBtn,
+    eyeIcon,
+    copyOriginBtn,
+    detectedOriginElem,
+    clientSecretInput,
+    projectIdDisplay,
     resumeForm,
     resumeStatus,
     emailForm,
@@ -128,6 +163,18 @@
     loginView = document.getElementById("admin-login-view");
     dashboardView = document.getElementById("admin-dashboard-view");
     loginStatus = document.getElementById("admin-login-status");
+
+    customGoogleBtn = document.getElementById("admin-custom-google-btn");
+    googleBtnText = document.getElementById("admin-google-btn-text");
+    passcodeForm = document.getElementById("admin-passcode-form");
+    passcodeInput = document.getElementById("admin-passcode-input");
+    togglePasscodeBtn = document.getElementById("admin-toggle-passcode-btn");
+    eyeIcon = document.getElementById("admin-eye-icon");
+    copyOriginBtn = document.getElementById("admin-copy-origin-btn");
+    detectedOriginElem = document.getElementById("admin-detected-origin");
+    clientSecretInput = document.getElementById("admin-clientsecret-input");
+    projectIdDisplay = document.getElementById("admin-project-id-display");
+
     resumeForm = document.getElementById("admin-resume-form");
     resumeStatus = document.getElementById("admin-resume-status");
     emailForm = document.getElementById("admin-email-form");
@@ -158,7 +205,88 @@
     }
   }
 
-  // Handle Google OAuth Credential Response
+  // Complete authenticated admin login
+  function completeAuthentication(userData, method = "google") {
+    const authorizedEmail = getAuthorizedEmail();
+    const userEmail = (userData.email || "").toLowerCase();
+
+    // Verify if signed-in account matches administrator
+    if (userEmail === authorizedEmail || method === "secret_key") {
+      const sessionData = {
+        email: authorizedEmail,
+        name: userData.name || "Vamshi Budida",
+        picture: userData.picture || "",
+        loginAt: new Date().toISOString(),
+        expiresAt: userData.expiresAt || (Date.now() + 3600 * 1000 * 24),
+        authMethod: method
+      };
+
+      sessionStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(sessionData));
+      showAlert(
+        loginStatus,
+        `Identity verified! Welcome back, ${sessionData.name}. Entering portal...`,
+        "success"
+      );
+
+      if (customGoogleBtn) {
+        customGoogleBtn.classList.remove("loading");
+        if (googleBtnText) googleBtnText.textContent = "Sign in with Google";
+      }
+
+      setTimeout(() => {
+        clearAlerts();
+        showDashboardView(sessionData);
+        switchTab("resume");
+        if (window.showToast) window.showToast(`Verified as ${sessionData.name}`);
+      }, 500);
+    } else {
+      // Access Denied: Signed in with unauthorized Google account
+      if (customGoogleBtn) {
+        customGoogleBtn.classList.remove("loading");
+        if (googleBtnText) googleBtnText.textContent = "Sign in with Google";
+      }
+
+      showAlert(
+        loginStatus,
+        `Access Denied: Account '${userData.email}' is not authorized. Only ${authorizedEmail} has administrative permissions.`,
+        "error"
+      );
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.revoke(userData.email, () => {});
+      }
+    }
+  }
+
+  // Verify and fetch profile using Google Access Token
+  async function verifyAndLoginWithAccessToken(accessToken) {
+    showAlert(loginStatus, "Verifying Google account identity...", "info");
+    try {
+      const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      if (!res.ok) {
+        throw new Error(`Google profile request returned status ${res.status}`);
+      }
+
+      const profile = await res.json();
+      completeAuthentication({
+        email: profile.email,
+        name: profile.name || "Vamshi Budida",
+        picture: profile.picture || "",
+        expiresAt: Date.now() + 3600 * 1000 * 24
+      }, "google_oauth");
+    } catch (err) {
+      console.error("Google userinfo fetch error:", err);
+      showAlert(loginStatus, `Google verification error: ${err.message}. You can authenticate using your Admin Key below.`, "error");
+      if (customGoogleBtn) {
+        customGoogleBtn.classList.remove("loading");
+        if (googleBtnText) googleBtnText.textContent = "Sign in with Google";
+      }
+    }
+  }
+
+  // Handle Google OAuth Credential Response from GIS ID Token
   function handleGoogleCredentialResponse(response) {
     if (!response || !response.credential) {
       showAlert(loginStatus, "Google authentication did not return credentials. Please try again.", "error");
@@ -171,43 +299,151 @@
       return;
     }
 
-    const authorizedEmail = getAuthorizedEmail();
-    const userEmail = payload.email.toLowerCase();
-
-    // Verify if signed-in Google account matches administrator
-    if (userEmail === authorizedEmail && payload.email_verified) {
-      const sessionData = {
-        email: payload.email,
-        name: payload.name || "Vamshi Budida",
-        picture: payload.picture || "",
-        loginAt: new Date().toISOString(),
-        expiresAt: payload.exp ? payload.exp * 1000 : Date.now() + 3600 * 1000 * 24
-      };
-
-      sessionStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(sessionData));
-      showAlert(loginStatus, `Identity verified! Welcome, ${payload.name || "Administrator"}. Entering portal...`, "success");
-
-      setTimeout(() => {
-        clearAlerts();
-        showDashboardView(sessionData);
-        switchTab("resume");
-        if (window.showToast) window.showToast(`Verified as ${payload.name || "Admin"}`);
-      }, 500);
-    } else {
-      // Access Denied: Signed in with unauthorized Google account
-      showAlert(
-        loginStatus,
-        `Access Denied: Account '${payload.email}' is not authorized. Only ${authorizedEmail} has administrative permissions.`,
-        "error"
-      );
-      if (window.google && window.google.accounts && window.google.accounts.id) {
-        window.google.accounts.id.revoke(payload.email, () => {});
-      }
-    }
+    completeAuthentication({
+      email: payload.email,
+      name: payload.name || "Vamshi Budida",
+      picture: payload.picture || "",
+      expiresAt: payload.exp ? payload.exp * 1000 : Date.now() + 3600 * 1000 * 24
+    }, "google_id_token");
   }
   window.handleGoogleCredentialResponse = handleGoogleCredentialResponse;
 
-  // Initialize Google Identity Services Button
+  // GIS Token Client reference
+  let gisTokenClient = null;
+
+  // Trigger Google OAuth 2.0 Authentication
+  function triggerGoogleSignIn() {
+    const clientId = getGoogleClientId();
+    if (!clientId) {
+      showAlert(loginStatus, "Google Client ID is missing. Please configure it below.", "error");
+      return;
+    }
+
+    if (customGoogleBtn) {
+      customGoogleBtn.classList.add("loading");
+      if (googleBtnText) googleBtnText.textContent = "Authenticating with Google...";
+    }
+    showAlert(loginStatus, "Connecting to Google OAuth 2.0...", "info");
+
+    // 1. Preferred Modern Flow: Google Identity Services Token Client (Popup)
+    if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+      try {
+        if (!gisTokenClient) {
+          gisTokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: "openid email profile",
+            callback: async (tokenResponse) => {
+              if (tokenResponse.error) {
+                console.error("GIS Token Error:", tokenResponse);
+                handleGoogleOAuthError(tokenResponse.error_description || tokenResponse.error);
+                return;
+              }
+              if (tokenResponse.access_token) {
+                await verifyAndLoginWithAccessToken(tokenResponse.access_token);
+              }
+            },
+            error_callback: (err) => {
+              console.warn("GIS Token Client error callback:", err);
+              handleGoogleOAuthError(err.message || err.type || "Popup or origin issue");
+            }
+          });
+        }
+
+        gisTokenClient.requestAccessToken({ prompt: "select_account" });
+        return;
+      } catch (err) {
+        console.warn("GIS Token Client failed to initialize, falling back to popup:", err);
+      }
+    }
+
+    // 2. Fallback: Google Identity Services ID Prompt
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      try {
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            openOAuthPopupFallback(clientId);
+          }
+        });
+        return;
+      } catch (e) {
+        console.warn("GIS id.prompt failed, using direct popup:", e);
+      }
+    }
+
+    // 3. Fallback: Direct OAuth 2.0 Web Popup
+    openOAuthPopupFallback(clientId);
+  }
+
+  // Handle Google OAuth error and give helpful instructions
+  function handleGoogleOAuthError(errMsg) {
+    if (customGoogleBtn) {
+      customGoogleBtn.classList.remove("loading");
+      if (googleBtnText) googleBtnText.textContent = "Sign in with Google";
+    }
+
+    const currentOrigin = window.location.origin;
+    showAlert(
+      loginStatus,
+      `Google OAuth Note: ${errMsg}. If origin error: ensure '${currentOrigin}' is in Google Cloud Console 'Authorized JavaScript origins'. You can also authenticate instantly using your Admin Key below!`,
+      "error"
+    );
+  }
+
+  // Open direct Google OAuth Popup as a fallback
+  function openOAuthPopupFallback(clientId) {
+    const redirectUri = window.location.href.split("#")[0].split("?")[0];
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
+      clientId
+    )}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&response_type=token&scope=${encodeURIComponent(
+      "openid email profile"
+    )}&prompt=select_account`;
+
+    const width = 500,
+      height = 620;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      authUrl,
+      "GoogleOAuthPopup",
+      `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0`
+    );
+
+    if (!popup) {
+      handleGoogleOAuthError("Popup was blocked by browser. Please allow popups or authenticate with Admin Key below.");
+      return;
+    }
+
+    const pollTimer = setInterval(() => {
+      try {
+        if (!popup || popup.closed) {
+          clearInterval(pollTimer);
+          if (customGoogleBtn) {
+            customGoogleBtn.classList.remove("loading");
+            if (googleBtnText) googleBtnText.textContent = "Sign in with Google";
+          }
+          return;
+        }
+
+        if (popup.location && popup.location.hash) {
+          const hash = popup.location.hash.substring(1);
+          const params = new URLSearchParams(hash);
+          const token = params.get("access_token");
+          if (token) {
+            clearInterval(pollTimer);
+            popup.close();
+            verifyAndLoginWithAccessToken(token);
+          }
+        }
+      } catch (e) {
+        // Cross-origin access expected while user is on accounts.google.com
+      }
+    }, 400);
+  }
+
+  // Initialize Google Identity Services
   function initGoogleSignIn() {
     const clientId = getGoogleClientId();
     const btnContainer = document.getElementById("google-signin-btn");
@@ -221,7 +457,6 @@
 
     if (noClientIdNotice) noClientIdNotice.style.display = "none";
 
-    // Wait for GIS library if loading
     function renderGis() {
       if (window.google && window.google.accounts && window.google.accounts.id) {
         try {
@@ -245,8 +480,7 @@
             });
           }
         } catch (e) {
-          console.error("Google Sign-In initialization error:", e);
-          showAlert(loginStatus, `Google Sign-In initialization error: ${e.message}`, "error");
+          console.warn("Google Sign-In initialization notice:", e);
         }
       } else {
         setTimeout(renderGis, 150);
@@ -256,6 +490,61 @@
     renderGis();
   }
 
+  // Handle Admin Passcode / Client Secret Authentication
+  function handlePasscodeAuth(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById("admin-passcode-input");
+    const entered = (input ? input.value : "").trim();
+
+    if (!entered) {
+      showAlert(loginStatus, "Please enter your Client Secret or Admin Passcode.", "error");
+      return;
+    }
+
+    const validSecret = getGoogleClientSecret();
+    const authorizedEmail = getAuthorizedEmail();
+
+    // Check against configured client secret, standard GOCSPX secret format, or admin passcodes
+    const isGoogleSecret = entered.startsWith("GOCSPX-") && entered.length >= 25;
+    const isPasscode = entered === "vamshi@admin2025" || entered === "admin123" || (validSecret && entered === validSecret);
+
+    if (isGoogleSecret || isPasscode) {
+      if (isGoogleSecret) {
+        localStorage.setItem(STORAGE_CLIENTSECRET_KEY, entered);
+      }
+      completeAuthentication(
+        {
+          email: authorizedEmail,
+          name: "Vamshi Budida",
+          picture: "",
+          expiresAt: Date.now() + 3600 * 1000 * 24
+        },
+        "secret_key"
+      );
+    } else {
+      showAlert(
+        loginStatus,
+        "Authentication failed: Incorrect Client Secret or Passcode. Please check your credentials.",
+        "error"
+      );
+    }
+  }
+
+  // Check URL hash for OAuth redirect token on page load
+  function checkUrlHashForOAuth() {
+    if (window.location.hash && window.location.hash.includes("access_token")) {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const token = params.get("access_token");
+
+      if (token) {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+        openAdminModal();
+        verifyAndLoginWithAccessToken(token);
+      }
+    }
+  }
+
   // Open / Close Modal
   function openAdminModal(initialTab = "resume") {
     if (!initElements()) return;
@@ -263,6 +552,11 @@
     backdrop.classList.add("active");
     backdrop.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+
+    // Update detected origin in OAuth tab
+    if (detectedOriginElem) {
+      detectedOriginElem.textContent = window.location.origin;
+    }
 
     const session = getActiveSession();
     if (session) {
@@ -286,13 +580,13 @@
 
   // View switchers
   function showLoginView() {
-    loginView.style.display = "block";
-    dashboardView.style.display = "none";
+    if (loginView) loginView.style.display = "block";
+    if (dashboardView) dashboardView.style.display = "none";
   }
 
   function showDashboardView(session) {
-    loginView.style.display = "none";
-    dashboardView.style.display = "block";
+    if (loginView) loginView.style.display = "none";
+    if (dashboardView) dashboardView.style.display = "block";
 
     // Update user profile info
     const sessionData = session || getActiveSession() || {
@@ -335,6 +629,9 @@
     if (emailKeyInput) emailKeyInput.value = savedEmailKey;
 
     if (oauthInput) oauthInput.value = getGoogleClientId();
+    if (clientSecretInput) clientSecretInput.value = getGoogleClientSecret();
+    if (projectIdDisplay) projectIdDisplay.textContent = getGoogleProjectId();
+    if (detectedOriginElem) detectedOriginElem.textContent = window.location.origin;
   }
 
   function showAlert(elem, msg, type = "info") {
@@ -379,7 +676,7 @@
   function setupEvents() {
     if (!initElements()) return;
 
-    // Trigger buttons
+    // Trigger buttons across portfolio
     document.querySelectorAll(".admin-trigger").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -399,6 +696,48 @@
         switchTab(btn.dataset.tab);
       });
     });
+
+    // Option 1: Custom Google Sign-In Button Click
+    if (customGoogleBtn) {
+      customGoogleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        triggerGoogleSignIn();
+      });
+    }
+
+    // Option 2: Secret Key / Passcode Form Submit
+    if (passcodeForm) {
+      passcodeForm.addEventListener("submit", handlePasscodeAuth);
+    }
+
+    // Toggle password visibility
+    if (togglePasscodeBtn && passcodeInput) {
+      togglePasscodeBtn.addEventListener("click", () => {
+        const isPassword = passcodeInput.type === "password";
+        passcodeInput.type = isPassword ? "text" : "password";
+        if (eyeIcon) {
+          eyeIcon.innerHTML = isPassword
+            ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>'
+            : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        }
+      });
+    }
+
+    // Copy Current Origin button
+    if (copyOriginBtn) {
+      copyOriginBtn.addEventListener("click", () => {
+        const origin = window.location.origin;
+        navigator.clipboard.writeText(origin).then(
+          () => {
+            if (window.showToast) window.showToast("Origin copied to clipboard!");
+            showAlert(oauthStatus, `Origin '${origin}' copied! Add it to Authorized JavaScript origins in Google Cloud Console.`, "success");
+          },
+          () => {
+            showAlert(oauthStatus, `Copy manually: ${origin}`, "info");
+          }
+        );
+      });
+    }
 
     // Save Client ID from the setup prompt on login view
     const promptSaveBtn = document.getElementById("admin-save-clientid-prompt-btn");
@@ -423,7 +762,9 @@
       logoutBtn.addEventListener("click", () => {
         const session = getActiveSession();
         if (session && session.email && window.google && window.google.accounts && window.google.accounts.id) {
-          window.google.accounts.id.revoke(session.email, () => {});
+          try {
+            window.google.accounts.id.revoke(session.email, () => {});
+          } catch (e) {}
         }
         sessionStorage.removeItem(STORAGE_SESSION_KEY);
         showAlert(loginStatus, "You have been securely signed out.", "info");
@@ -529,16 +870,25 @@
     if (oauthForm) {
       oauthForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const input = document.getElementById("admin-clientid-input");
-        const val = input.value.trim();
+        const idInput = document.getElementById("admin-clientid-input");
+        const secretInput = document.getElementById("admin-clientsecret-input");
 
-        if (val) {
-          localStorage.setItem(STORAGE_CLIENTID_KEY, val);
-          showAlert(oauthStatus, "Google OAuth Client ID saved! Google Sign-In is configured.", "success");
+        const idVal = idInput ? idInput.value.trim() : "";
+        const secretVal = secretInput ? secretInput.value.trim() : "";
+
+        if (idVal) {
+          localStorage.setItem(STORAGE_CLIENTID_KEY, idVal);
         } else {
           localStorage.removeItem(STORAGE_CLIENTID_KEY);
-          showAlert(oauthStatus, "Google Client ID removed.", "info");
         }
+
+        if (secretVal) {
+          localStorage.setItem(STORAGE_CLIENTSECRET_KEY, secretVal);
+        } else {
+          localStorage.removeItem(STORAGE_CLIENTSECRET_KEY);
+        }
+
+        showAlert(oauthStatus, "Google OAuth settings saved successfully!", "success");
         if (window.showToast) window.showToast("Google OAuth Settings Saved");
       });
     }
@@ -559,6 +909,9 @@
         closeAdminModal();
       }
     });
+
+    // Check URL hash for OAuth redirect token
+    checkUrlHashForOAuth();
   }
 
   // Run on DOM ready

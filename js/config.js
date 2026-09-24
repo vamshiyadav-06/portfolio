@@ -20,7 +20,11 @@ const PORTFOLIO_DATA = {
 
   admin: {
     authorizedEmail: "vamshiyadav1905@gmail.com",
-    googleClientId: "452935950182-tjr2ktjhus4mc5cr8caigqsm2c77fbu8.apps.googleusercontent.com"
+    googleClientId: "452935950182-tjr2ktjhus4mc5cr8caigqsm2c77fbu8.apps.googleusercontent.com",
+    projectId: "gen-lang-client-0604015366",
+    authUri: "https://accounts.google.com/o/oauth2/auth",
+    tokenUri: "https://oauth2.googleapis.com/token",
+    authProviderX509CertUrl: "https://www.googleapis.com/oauth2/v1/certs"
   },
 
   about: {
