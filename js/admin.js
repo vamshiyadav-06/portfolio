@@ -94,7 +94,7 @@
       (window.PORTFOLIO_DATA &&
         window.PORTFOLIO_DATA.personal &&
         window.PORTFOLIO_DATA.personal.resumeUrl) ||
-      "https://docs.google.com/document/d/1v65KkNdUXBgzqQLH0vtYNsNY7-4TIDkJ/edit"
+      "https://docs.google.com/document/d/1v65KkNdUXBgzqQLH0vtYNsNY7-4TIDkJ"
     );
   }
 
@@ -811,7 +811,7 @@
       resetResumeBtn.addEventListener("click", () => {
         localStorage.removeItem(STORAGE_RESUME_KEY);
         const originalUrl =
-          "https://docs.google.com/document/d/1v65KkNdUXBgzqQLH0vtYNsNY7-4TIDkJ/edit";
+          "https://docs.google.com/document/d/1v65KkNdUXBgzqQLH0vtYNsNY7-4TIDkJ";
         applyResumeUrl(originalUrl);
         document.getElementById("admin-resume-input").value = originalUrl;
         showAlert(resumeStatus, "Resume link reset to original default.", "info");
