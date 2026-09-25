@@ -12,7 +12,7 @@ const PORTFOLIO_DATA = {
     email: "vamshiyadav1905@gmail.com",
     github: "https://github.com/vamshiyadav-06",
     linkedin: "https://www.linkedin.com/in/vamshi-budida-087151425/",
-    resumeUrl: "https://drive.google.com/file/d/1Cw5zAYogBXlEXsfJ7XzEkQovW-t6K0sp/view?usp=sharing",
+    resumeUrl: "https://docs.google.com/document/d/1v65KkNdUXBgzqQLH0vtYNsNY7-4TIDkJ/edit?usp=sharing&ouid=117045589373818490497&rtpof=true&sd=true",
     avatar: "assets/vamshi-profile.jpg",
     statusBadge: "Available for AI & Full Stack Roles",
     languages: ["Python", "SQL"]
